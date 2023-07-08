@@ -23,9 +23,9 @@ router.post("/signup", async (req, res) => {
       req.body.password = hashedPassword;
       const newUser = await userModal.create(req.body);
     } else {
-      res.status(400).send("User already exists");
+      res.status(400).send({message:"User already exists"});
     }
-    res.status(201).send("Created successfully");
+    res.status(201).send({message:"Created successfully"});
   } catch (error) {
     res.status(500).send({
       message: "Internal Error",
