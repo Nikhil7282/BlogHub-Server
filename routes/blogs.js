@@ -4,8 +4,9 @@ var router = express.Router();
 var mongoose = require("mongoose");
 const { url } = require("../common/dbconfig");
 const blogModal = require("../modals/blogSchema");
+const jwt=require('jsonwebtoken')
 //Bcrypt
-// const { hashPassword, compare, createToken,validate } = require("../common/auth");
+const {validate } = require("../common/auth");
 
 //DB Connection
 mongoose.connect(url);
@@ -13,6 +14,22 @@ mongoose.connect(url);
 router.get('/',async(req,res)=>{
     const blogs=await blogModal.find({})
     res.send(blogs)
+})
+
+router.get('/userpost',validate, async(req,res)=>{
+    // res.send("Hello")
+    const token=req.headers.authorization.split(" ")[1]
+    // console.log(token)
+    let data=await jwt.decode(token)
+    // console.log(data)
+    if(data){
+        const userBlogs=await blogModal.find({user:data.id})
+    // console.log(userBlogs)
+    res.send(userBlogs)
+    }
+    else{
+        res.send({message:"Internal Error"})
+    }
 })
 
 router.post('/',async(req,res)=>{
