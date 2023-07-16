@@ -32,14 +32,14 @@ router.get('/userpost',validate, async(req,res)=>{
     }
 })
 
-router.post('/',async(req,res)=>{
+router.post('/',validate,async(req,res)=>{
     const blog=await blogModal.findOne({title:req.body.title,user:req.body.user})
     if(blog){
         res.status(400).send({message:"The Title of the post is already used"})
     }
     else{
     const newBlog=await blogModal.create(req.body)
-    res.status(200).send({message:"Blog Post Added"})
+    res.status(200).send({message:"Blog Posted"})
     }
 })
 
@@ -66,10 +66,22 @@ router.put('/updatePost/:id',async(req,res)=>{
     }
 })
 
-router.delete('/deletePost/:id',async(req,res)=>{
-    const id=req.params.id
-    const posts=await blogModal.deleteOne({_id:id})
-    res.json({message:"Post Deleted"})
+router.delete('/deletePost/:id',validate,async(req,res)=>{
+    // const userId=req.body.user
+    const postId=req.params.id
+    const post=await blogModal.findOne({_id:postId})
+    if(post){
+    const posts=await blogModal.deleteOne({_id:postId})
+    res.status(200).send({message:"Post Deleted"})
+    }
+    else{
+        res.status(400).send({message:"Post Not Found"})
+    }
+    // console.log(postId)
+    // console.log(userId)
+    
+    // const posts=await blogModal.deleteOne({$and:[{_id:postId},{user:userId}]})
+    // console.log(posts)
 })
 
 
