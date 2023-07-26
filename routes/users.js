@@ -9,10 +9,19 @@ const { hashPassword, compare, createToken,validate } = require("../common/auth"
 
 //DB Connection
 mongoose.connect(url);
-
+const options={maxTimeMS:15000};
 router.get("/",validate, async function (req, res, next) {
-  const user = await userModal.find({});
-  res.send(user);
+  const user = await userModal.find({},null,options);
+  try {
+    if(user){
+      res.send(user);
+    }
+    else{
+      res.send({message:"Not Found"})
+    }
+  } catch (error) {
+    res.send({message:"Internal Error"})
+  }
 });
 
 router.post("/signup", async (req, res) => {
