@@ -10,10 +10,19 @@ const {validate } = require("../common/auth");
 
 //DB Connection
 mongoose.connect(url);
-
+const options={maxTimeMS:15000};
 router.get('/',async(req,res)=>{
-    const blogs=await blogModal.find({})
-    res.send(blogs)
+    const blogs=await blogModal.find({},null,options)
+    try {
+        if(blogs){
+          res.send(user);
+        }
+        else{
+          res.send({message:"Not Found"})
+        }
+      } catch (error) {
+        res.send({message:"Internal Error"})
+      }
 })
 
 router.get('/userpost',validate, async(req,res)=>{
