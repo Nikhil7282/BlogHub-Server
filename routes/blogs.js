@@ -26,29 +26,37 @@ router.get('/',async(req,res)=>{
 })
 
 router.get('/userpost',validate, async(req,res)=>{
-    // res.send("Hello")
+    try {
+        // res.send("Hello")
     const token=req.headers.authorization.split(" ")[1]
     // console.log(token)
     let data=await jwt.decode(token)
     // console.log(data)
     if(data){
-        const userBlogs=await blogModal.find({user:data.id})
+        const userBlogs=await blogModal.find({user:data.id},null,options)
     // console.log(userBlogs)
-    res.send(userBlogs)
+    res.status(200).send(userBlogs)
     }
     else{
-        res.send({message:"Internal Error"})
+        res.status(400).send({message:"No Token Found"})
+    }
+    } catch (error) {
+        res.status(500).send({message:"Internal Error"})
     }
 })
 
 router.post('/',validate,async(req,res)=>{
-    const blog=await blogModal.findOne({title:req.body.title,user:req.body.user})
+    try {
+        const blog=await blogModal.findOne({title:req.body.title,user:req.body.user})
     if(blog){
         res.status(400).send({message:"The Title of the post is already used"})
     }
     else{
     const newBlog=await blogModal.create(req.body)
     res.status(200).send({message:"Blog Posted"})
+    }
+    } catch (error) {
+        res.status(500).send({message:"Internal Error"})
     }
 })
 
@@ -77,7 +85,8 @@ router.put('/updatePost/:id',async(req,res)=>{
 
 router.delete('/deletePost/:id',validate,async(req,res)=>{
     // const userId=req.body.user
-    const postId=req.params.id
+    try {
+        const postId=req.params.id
     const post=await blogModal.findOne({_id:postId})
     if(post){
     const posts=await blogModal.deleteOne({_id:postId})
@@ -85,6 +94,9 @@ router.delete('/deletePost/:id',validate,async(req,res)=>{
     }
     else{
         res.status(400).send({message:"Post Not Found"})
+    }
+    } catch (error) {
+        res.status(500).send({message:"Internal Error"})
     }
     // console.log(postId)
     // console.log(userId)

@@ -44,7 +44,8 @@ router.post("/signup", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const user = await userModal.findOne({ username: req.body.username });
+  try {
+    const user = await userModal.findOne({ username: req.body.username });
   if (user) {
     if (await compare(req.body.password, user.password)) {
       const token = await createToken({
@@ -59,6 +60,9 @@ router.post("/login", async (req, res) => {
     }
   } else {
     res.status(400).send({ message: "User Not Found" });
+  }
+  } catch (error) {
+    res.status(500).send({message:"Internal error"})
   }
 });
 
