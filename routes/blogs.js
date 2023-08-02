@@ -9,13 +9,21 @@ const jwt=require('jsonwebtoken')
 const {validate } = require("../common/auth");
 
 //DB Connection
-mongoose.connect(url);
+
+mongoose.connect(url)
+.then((response)=>{
+    console.log("Db Connected")
+})
+.catch((error)=>{
+    console.log(error);
+})
+
 const options={maxTimeMS:15000};
 router.get('/',async(req,res)=>{
     const blogs=await blogModal.find({},null,options)
     try {
         if(blogs){
-          res.send(user);
+          res.send(blogs);
         }
         else{
           res.send({message:"Not Found"})
