@@ -21,8 +21,15 @@ router.get('/',async(req,res)=>{
           res.send({message:"Not Found"})
         }
       } catch (error) {
-        res.send({message:"Internal Error"})
+        throw error
+        // res.send({message:"Internal Error"})
       }
+    // blogModal.find({},null,options)
+    // .then((response)=>{
+    //     if(response){
+    //         res.send()
+    //     }
+    // })
 })
 
 router.get('/userpost',validate, async(req,res)=>{
@@ -41,7 +48,8 @@ router.get('/userpost',validate, async(req,res)=>{
         res.status(400).send({message:"No Token Found"})
     }
     } catch (error) {
-        res.status(500).send({message:"Internal Error"})
+        throw error
+        // res.status(500).send({message:"Internal Error"})
     }
 })
 
@@ -56,7 +64,8 @@ router.post('/',validate,async(req,res)=>{
     res.status(200).send({message:"Blog Posted"})
     }
     } catch (error) {
-        res.status(500).send({message:"Internal Error"})
+        throw error
+        // res.status(500).send({message:"Internal Error"})
     }
 })
 
@@ -75,7 +84,8 @@ router.put('/updatePost/:id',async(req,res)=>{
             // console.log(content[0]+"qwerty")
             res.json({message:"Post updated"})
         } catch (error) {
-            console.log(error)
+            throw error
+            // console.log(error)
         }
     }
     else{
@@ -96,7 +106,8 @@ router.delete('/deletePost/:id',validate,async(req,res)=>{
         res.status(400).send({message:"Post Not Found"})
     }
     } catch (error) {
-        res.status(500).send({message:"Internal Error"})
+        throw error
+        // res.status(500).send({message:"Internal Error"})
     }
     // console.log(postId)
     // console.log(userId)

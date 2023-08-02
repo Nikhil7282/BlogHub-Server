@@ -11,21 +11,46 @@ const { hashPassword, compare, createToken,validate } = require("../common/auth"
 mongoose.connect(url);
 const options={maxTimeMS:15000};
 router.get("/",validate, async function (req, res, next) {
-  const user = await userModal.find({},null,options);
-  try {
-    if(user){
-      res.send(user);
+  await userModal.find({},null,options)
+  .then((response)=>{
+    if(response && response._id){
+      res.status(200).send(user)
     }
     else{
-      res.send({message:"Not Found"})
+      res.status(400).send({message:"Not Found"})
     }
-  } catch (error) {
-    res.send({message:"Internal Error"})
-  }
+  })
+  .catch((error)=>{
+    throw error
+    // res.status(500).send({message:"Internal Error"})
+  })
+  // try {
+  //   if(user){
+  //     res.send(user);
+  //   }
+  //   else{
+  //     res.send({message:"Not Found"})
+  //   }
+  // } catch (error) {
+  //   res.send({message:"Internal Error"})
+  // }
 });
 
 router.post("/signup", async (req, res) => {
   const user = await userModal.findOne({ username: req.body.username });
+
+  // if(!user){
+  //     const hashedPassword = await hashPassword(req.body.password);
+  //     req.body.password = hashedPassword;
+  //     userModal.create(req.body)
+  //     .then((response)=>{
+  //       if(response && response._id){
+  //         res.status(200).send({message:"Created Successfully"})
+  //       }
+  //     })
+
+
+  // }
   try {
     if (!user) {
       const hashedPassword = await hashPassword(req.body.password);
@@ -36,16 +61,17 @@ router.post("/signup", async (req, res) => {
     }
     res.status(201).send({message:"Created successfully"});
   } catch (error) {
-    res.status(500).send({
-      message: "Internal Error",
-      error,
-    });
+    throw error
+    // res.status(500).send({
+    //   message: "Internal Error",
+    //   error,
+    // });
   }
 });
 
 router.post("/login", async (req, res) => {
+  const user = await userModal.findOne({ username: req.body.username });
   try {
-    const user = await userModal.findOne({ username: req.body.username });
   if (user) {
     if (await compare(req.body.password, user.password)) {
       const token = await createToken({
@@ -62,7 +88,8 @@ router.post("/login", async (req, res) => {
     res.status(400).send({ message: "User Not Found" });
   }
   } catch (error) {
-    res.status(500).send({message:"Internal error"})
+    throw error
+    // res.status(500).send({message:"Internal error"})
   }
 });
 
@@ -84,18 +111,23 @@ router.put('/:id',async(req,res)=>{
     res.status(400).send({message:"User not found"})
   }
   } catch (error) {
-    res.status(400).send({message:"Internal Error",error})
+    throw error
+    // res.status(400).send({message:"Internal Error",error})
   }
 })
 
 router.delete('/:id',async(req,res)=>{
-  const user= await userModal.findOne({_id:req.params.id})
+  try {
+    const user= await userModal.findOne({_id:req.params.id})
   if(user){
     await user.deleteOne()
     res.status(200).send({message:"User Deleted"})
   }
   else{
     res.status(400).send({message:"User not found"})
+  }
+  } catch (error) {
+    throw error
   }
 })
 
