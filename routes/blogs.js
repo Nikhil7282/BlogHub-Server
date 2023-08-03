@@ -125,5 +125,45 @@ router.delete('/deletePost/:id',validate,async(req,res)=>{
 })
 
 
+//liking a post
+
+router.post('/likePost/:id/like',validate,async(req,res)=>{
+    try {
+        const blog=await blogModal.findOne({_id:req.params.id});
+        // console.log(blog)
+        if(!blog){
+            return res.status(404).json({message:"Post Not Found"})
+        }
+        
+        blog.likes.push(req.body.user)
+        await blog.save()
+        return res.status(200).json({likes:blog.likes.length});
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message:"Internal Error"})
+    }
+})
+
+router.post('/likePost/:id/unlike',validate,async(req,res)=>{
+    try {
+        const blog=await blogModal.findOne({_id:req.params.id});
+        // console.log(blog)
+        if(!blog){
+            return res.status(404).json({message:"Post Not Found"})
+        }
+        const index=blog.likes.indexOf(req.body.user)
+        if(index!=-1){
+            blog.likes.splice(index,1)
+            await blog.save()
+        }
+        return res.status(200).json({likes:blog.likes.length});
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message:"Internal Error"})
+    }
+})
+
+
+
 
 module.exports = router;

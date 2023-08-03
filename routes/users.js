@@ -80,7 +80,8 @@ router.post("/login", async (req, res) => {
         phone: user.phone,
         id:user._id
       });
-      res.status(200).send({ message: "User Login SuccessFul", token });
+      // res.status(200).send({message:"User Login SuccessFul",token})
+      res.status(200).json({ message: "User Login SuccessFul", token:token,userId:user._id,username:user.username});
     } else {
       res.status(402).send({ message: "Invalid Credentials" });
     }
