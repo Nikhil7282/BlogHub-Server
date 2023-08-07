@@ -19,7 +19,7 @@ const createToken=async(payload)=>{
 }
 
 const validate=async(req,res,next)=>{
-    if(req.headers.authorization){
+    if(req.headers.Authorization){
         const token=req.headers.authorization.split(" ")[1]
         let data=await jwt.decode(token)
         if(Math.floor((+new Date())/1000)<data.exp){
@@ -27,10 +27,12 @@ const validate=async(req,res,next)=>{
             next()
         }
         else{
+            console.log("Token Expired");
             res.status(401).send({message:"Token Expired"})
         }
     }
     else{
+        console.log("Token not Found");
         res.status(400).send({message:"Token not found"})
     }
 }

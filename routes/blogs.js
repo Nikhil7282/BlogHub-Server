@@ -127,14 +127,13 @@ router.delete('/deletePost/:id',validate,async(req,res)=>{
 
 //liking a post
 
-router.post('/likePost/:id/like',validate,async(req,res)=>{
+router.post('/likePost/:id',validate,async(req,res)=>{
     try {
         const blog=await blogModal.findOne({_id:req.params.id});
         // console.log(blog)
         if(!blog){
             return res.status(404).json({message:"Post Not Found"})
         }
-        
         blog.likes.push(req.body.user)
         await blog.save()
         return res.status(200).json({likes:blog.likes.length});
@@ -144,7 +143,7 @@ router.post('/likePost/:id/like',validate,async(req,res)=>{
     }
 })
 
-router.post('/likePost/:id/unlike',validate,async(req,res)=>{
+router.post('/unLikePost/:id',validate,async(req,res)=>{
     try {
         const blog=await blogModal.findOne({_id:req.params.id});
         // console.log(blog)
