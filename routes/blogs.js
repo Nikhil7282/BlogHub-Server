@@ -127,7 +127,7 @@ router.delete('/deletePost/:id',validate,async(req,res)=>{
 
 //liking a post
 
-router.post('/likePost/:id',validate,async(req,res)=>{
+router.post('/likePost/:id',async(req,res)=>{
     try {
         const blog=await blogModal.findOne({_id:req.params.id});
         // console.log(blog)
@@ -143,7 +143,7 @@ router.post('/likePost/:id',validate,async(req,res)=>{
     }
 })
 
-router.post('/unLikePost/:id',validate,async(req,res)=>{
+router.post('/unLikePost/:id',async(req,res)=>{
     try {
         const blog=await blogModal.findOne({_id:req.params.id});
         // console.log(blog)

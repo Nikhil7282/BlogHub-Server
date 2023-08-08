@@ -19,7 +19,7 @@ const createToken=async(payload)=>{
 }
 
 const validate=async(req,res,next)=>{
-    if(req.headers.Authorization){
+    if(req.headers.authorization){
         const token=req.headers.authorization.split(" ")[1]
         let data=await jwt.decode(token)
         if(Math.floor((+new Date())/1000)<data.exp){
