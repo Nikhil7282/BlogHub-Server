@@ -206,4 +206,20 @@ router.delete("/comment/:id",validate,async(req,res)=>{
   }
 })
 
+
+router.get("/comment/:id",async(req,res)=>{
+  try {
+    const blog=await blogModal.findOne({_id:req.params.id})
+    if(!blog){
+      return res.json({message:"Post Not Found"})
+    }
+    const comments = await blogModal.findById(req.params.id).populate('comments');
+  // console.log(blogPost.comments);
+  return res.status(200).json({comments:comments.comments})
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({message:"Internal Error"})
+  }
+})
+
 module.exports = router;
