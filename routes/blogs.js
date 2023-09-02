@@ -163,7 +163,9 @@ router.post("/unLikePost/:id", async (req, res) => {
   }
 });
 
-router.post("/comment/:id", async (req, res) => {
+router.post("/comment/:id",async (req, res) => {
+  console.log(req.body);
+  console.log(req.params.id);
   try {
     const blog = await blogModal.findOne({ _id: req.params.id });
     if (!blog) {
@@ -177,8 +179,31 @@ router.post("/comment/:id", async (req, res) => {
     res.status(200).json({message:"Comment Added"})
   } catch (error) {
     res.status(500).json({message:"Internal Error"})
-
   }
 });
+
+router.delete("/comment/:id",validate,async(req,res)=>{
+  console.log(req.body)
+  try {
+    const blog=await blogModal.findOne({_id:req.params.id})
+    if(!blog){
+      return res.json({message:"Post Not Found"})
+    }
+    const comment=await commentModal.findOne({_id:req.body.commentId})
+    if(!comment){
+      return res.json({message:"Comment Not Found"})
+    }
+    else{
+      await commentModal.deleteOne({_id:req.body.commentId})
+      await blogModal.findOneAndUpdate(
+        {_id:req.params.id},
+        {$pull:{comments:req.body.commentId}}
+      )
+      return res.status(200).json({message:"Comment Deleted"})
+    }
+  } catch (error) {
+    return res.status(500).json({message:"Internal Error"})
+  }
+})
 
 module.exports = router;

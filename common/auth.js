@@ -22,8 +22,10 @@ const validate=async(req,res,next)=>{
     if(req.headers.authorization){
         const token=req.headers.authorization.split(" ")[1]
         let data=await jwt.decode(token)
+        console.log(data);
         if(Math.floor((+new Date())/1000)<data.exp){
             req.body.user=data.id
+            req.body.name=data.username
             next()
         }
         else{
