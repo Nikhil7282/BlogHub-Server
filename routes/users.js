@@ -10,11 +10,13 @@ const { hashPassword, compare, createToken,validate } = require("../common/auth"
 //DB Connection
 mongoose.connect(url);
 const options={maxTimeMS:15000};
-router.get("/",validate, async function (req, res, next) {
-  await userModal.find({},null,options)
+
+router.get("/",validate, function (req, res, next) {
+  userModal.find({},null,options)
   .then((response)=>{
-    if(response && response._id){
-      res.status(200).send(user)
+    // console.log(response);
+    if(response || response._id){
+      res.status(200).send(response)
     }
     else{
       res.status(400).send({message:"Not Found"})
@@ -89,8 +91,9 @@ router.post("/login", async (req, res) => {
     res.status(400).send({ message: "User Not Found" });
   }
   } catch (error) {
-    throw error
-    // res.status(500).send({message:"Internal error"})
+    console.log(error);
+    // throw error
+    return res.status(500).send({message:"Internal error"})
   }
 });
 

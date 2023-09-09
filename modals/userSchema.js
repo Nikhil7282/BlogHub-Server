@@ -19,7 +19,6 @@ const userSchema=new mongoose.Schema({
     phone:{
         type:String,
         required:true,
-        validate:(val)=>{return validator.isMobilePhone(val,'en-IN')}
     },
     createdAt:{
         type:Date,

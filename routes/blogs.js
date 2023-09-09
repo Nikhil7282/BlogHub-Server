@@ -163,6 +163,8 @@ router.post("/unLikePost/:id", async (req, res) => {
   }
 });
 
+
+//Comments
 router.post("/comment/:id",async (req, res) => {
   console.log(req.body);
   console.log(req.params.id);
@@ -178,12 +180,13 @@ router.post("/comment/:id",async (req, res) => {
     );
     res.status(200).json({message:"Comment Added"})
   } catch (error) {
+    console.log(error);
     res.status(500).json({message:"Internal Error"})
   }
 });
 
 router.delete("/comment/:id",validate,async(req,res)=>{
-  console.log(req.body)
+  // console.log(req.body)
   try {
     const blog=await blogModal.findOne({_id:req.params.id})
     if(!blog){

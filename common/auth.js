@@ -19,6 +19,10 @@ const createToken=async(payload)=>{
 }
 
 const validate=async(req,res,next)=>{
+    // console.log(req)
+    // console.log(req.body);
+    console.log(req.headers);
+    // console.log(req.headers.authorization);
     if(req.headers.authorization){
         const token=req.headers.authorization.split(" ")[1]
         let data=await jwt.decode(token)
@@ -29,12 +33,12 @@ const validate=async(req,res,next)=>{
             next()
         }
         else{
-            console.log("Token Expired");
+            // console.log("Token Expired");
             res.status(401).send({message:"Token Expired"})
         }
     }
     else{
-        console.log("Token not Found");
+        // console.log("Token not Found");
         res.status(400).send({message:"Token not found"})
     }
 }
