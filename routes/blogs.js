@@ -135,9 +135,15 @@ router.post("/likePost/:id", async (req, res) => {
     if (!blog) {
       return res.status(404).json({ message: "Post Not Found" });
     }
+    const like=await blog.likes.some((user)=>user===user)
+    console.log("Like:"+like);
+    if(like){
+      return res.status(400).json({message:"Post Already Liked"})
+    }
     blog.likes.push(req.body.user);
     await blog.save();
     return res.status(200).json({ likes: blog.likes.length });
+
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal Error" });
