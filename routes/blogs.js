@@ -12,8 +12,9 @@ const { validate } = require("../common/auth");
 //DB Connection
 
 mongoose
-  .connect(url)
+  .connect(url,{useNewUrlParser:true,useUnifiedTopology:true})
   .then((response) => {
+    // console.log(response);
     console.log("Db Connected");
   })
   .catch((error) => {
@@ -22,7 +23,7 @@ mongoose
 
 const options = { maxTimeMS: 15000 };
 router.get("/", async (req, res) => {
-  const blogs = await blogModal.find({}, null, options);
+  const blogs = await blogModal.find({});
   try {
     if (blogs) {
       res.send(blogs);
@@ -127,30 +128,34 @@ router.delete("/deletePost/:id", validate, async (req, res) => {
 });
 
 //liking a post
-
-router.post("/likePost/:id", async (req, res) => {
+router.post("/likePost/:id",validate,async (req, res) => {
   try {
     const blog = await blogModal.findOne({ _id: req.params.id });
     // console.log(blog)
     if (!blog) {
       return res.status(404).json({ message: "Post Not Found" });
     }
-    const like=await blog.likes.some((user)=>user===user)
+    // console.log(req.user);
+    const like=await blog.likes.some((user)=>user===req.user)
     console.log("Like:"+like);
-    if(like){
-      return res.status(400).json({message:"Post Already Liked"})
-    }
+    // if(like){
+    //   // return res.redirect(`/unLikePost/${req.params.id}`)
+    //   return res.status(400).json({message:"Post Already Liked"})
+    // }
+    if(!like){
     blog.likes.push(req.body.user);
     await blog.save();
+    // console.log(blog);
     return res.status(200).json({ likes: blog.likes.length });
-
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal Error" });
   }
 });
 
-router.post("/unLikePost/:id", async (req, res) => {
+router.post("/unLikePost/:id",validate,async (req, res) => {
+  console.log(req.params.id);
   try {
     const blog = await blogModal.findOne({ _id: req.params.id });
     // console.log(blog)
