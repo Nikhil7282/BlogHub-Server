@@ -170,7 +170,7 @@ router.post("/forgetPassword", async (req, res) => {
       html: `
       <h1>Please try to remember the password...🤦‍♂️</h1>
       <h3>Reset Password For the username ${user.username}</h3>
-      <a href="http://localhost:3000/resetPassword/${token}">👉Click here to reset Password</a>
+      <a href="https://bloghub20.netlify.app/resetPassword/${token}">👉Click here to reset Password</a>
       <h2>The link is valid upto 10 hours</h2>
       <h3>🙅‍♂️Try not to share the link🙅‍♂️</h3>
       `,
