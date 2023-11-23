@@ -14,8 +14,16 @@ const compare=async(password,hashedPassword)=>{
 }
 
 const createToken=async(payload)=>{
-    const token=await jwt.sign(payload,secretKey,{expiresIn:'24h'})
+    const token=await jwt.sign(payload,secretKey,{expiresIn:'10h'})
     return token
+}
+const verifyToken=async(token)=>{
+    return await jwt.verify(token,secretKey)
+}
+
+const decodeToken=async(token)=>{
+    const data=await jwt.decode(token)
+    return data
 }
 
 const validate=async(req,res,next)=>{
@@ -43,4 +51,4 @@ const validate=async(req,res,next)=>{
     }
 }
 
-module.exports={hashPassword,compare,createToken,validate}
+module.exports={hashPassword,compare,createToken,validate,decodeToken,verifyToken}
