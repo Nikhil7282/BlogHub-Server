@@ -177,19 +177,20 @@ router.post("/unLikePost/:id",validate,async (req, res) => {
 
 //Comments
 router.post("/comment/:id",async (req, res) => {
-  console.log(req.body);
-  console.log(req.params.id);
+  // console.log(req.body);
+  // console.log(req.params.id);
   try {
     const blog = await blogModal.findOne({ _id: req.params.id });
     if (!blog) {
       return res.status(404).json({ message: "Post Not Found" });
     }
     const newComment = await commentModal.create(req.body);
+    // console.log(newComment);
     await blogModal.findOneAndUpdate(
       { _id: req.params.id },
       { $push: { comments: newComment._id } }
     );
-    res.status(200).json({message:"Comment Added"})
+    res.status(200).json({message:"Comment Added",comment:newComment})
   } catch (error) {
     console.log(error);
     res.status(500).json({message:"Internal Error"})
