@@ -50,18 +50,6 @@ router.get("/", validate, function (req, res, next) {
 
 router.post("/signup", async (req, res) => {
   const user = await userModal.findOne({ username: req.body.username });
-
-  // if(!user){
-  //     const hashedPassword = await hashPassword(req.body.password);
-  //     req.body.password = hashedPassword;
-  //     userModal.create(req.body)
-  //     .then((response)=>{
-  //       if(response && response._id){
-  //         res.status(200).send({message:"Created Successfully"})
-  //       }
-  //     })
-
-  // }
   try {
     if (!user) {
       const hashedPassword = await hashPassword(req.body.password);
@@ -72,11 +60,10 @@ router.post("/signup", async (req, res) => {
     }
     res.status(201).send({ message: "Created successfully" });
   } catch (error) {
-    throw error;
-    // res.status(500).send({
-    //   message: "Internal Error",
-    //   error,
-    // });
+    res.status(500).send({
+      message: "Internal Error",
+      error,
+    });
   }
 });
 
@@ -91,7 +78,6 @@ router.post("/login", async (req, res) => {
           phone: user.phone,
           id: user._id,
         });
-        // res.status(200).send({message:"User Login SuccessFul",token})
         res.status(200).json({
           message: "User Login SuccessFul",
           token: token,
@@ -106,7 +92,6 @@ router.post("/login", async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    // throw error
     return res.status(500).send({ message: "Internal error" });
   }
 });
@@ -149,21 +134,22 @@ router.delete("/:id", async (req, res) => {
 
 //forget-Password
 router.post("/forgetPassword", async (req, res) => {
-  // console.log(req.body.email);
   const user = await userModal.findOne({ email: req.body.email });
   // console.log(user);
   if (user) {
     const token = await createToken({ id: user._id });
     var transporter = nodemailer.createTransport({
-      service: "gmail",
+      pool: true,
+      service: "hotmail",
+      // port: 2525,
       auth: {
-        user: "nikhil.sa2020ece@sece.ac.in",
-        pass: "Nikhilsa@2003",
+        user: "bloghub003@outlook.com",
+        pass: process.env.emailPassword,
       },
     });
 
     var mailOptions = {
-      from: "bloghub96@gmail.com",
+      from: "bloghub003@outlook.com",
       to: `${req.body.email}`,
       subject: "Reset your password",
       text: `http://localhost:3000/resetPassword/${token}`,
@@ -174,7 +160,6 @@ router.post("/forgetPassword", async (req, res) => {
       <h2>The link is valid upto 10 hours</h2>
       <h3>🙅‍♂️Try not to share the link🙅‍♂️</h3>
       `,
-
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
