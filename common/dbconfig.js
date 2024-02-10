@@ -1,3 +1,2 @@
-// const url=`mongodb+srv://nikhilsa:root123@blogcluster.ppvtwcb.mongodb.net/${process.env.dbName}`
-const url=`mongodb+srv://Nikhil:root123@bloghub.pavovmy.mongodb.net/${process.env.dbName}?retryWrites=true&w=majority`
-module.exports={url}
+const url = `mongodb+srv://Nikhil:root123@bloghub.pavovmy.mongodb.net/${process.env.dbName}?retryWrites=true&w=majority`;
+module.exports = { url };
