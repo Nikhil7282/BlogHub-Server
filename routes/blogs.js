@@ -1,5 +1,8 @@
 var express = require("express");
 var router = express.Router();
+//multer
+const multer = require("multer");
+
 //DB
 var mongoose = require("mongoose");
 const { url } = require("../common/dbconfig");
@@ -10,7 +13,6 @@ const jwt = require("jsonwebtoken");
 const { validate } = require("../common/auth");
 
 //DB Connection
-
 mongoose
   .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((response) => {
@@ -32,14 +34,7 @@ router.get("/", async (req, res) => {
     }
   } catch (error) {
     throw error;
-    // res.send({message:"Internal Error"})
   }
-  // blogModal.find({},null,options)
-  // .then((response)=>{
-  //     if(response){
-  //         res.send()
-  //     }
-  // })
 });
 
 router.get("/userpost", validate, async (req, res) => {
@@ -58,7 +53,6 @@ router.get("/userpost", validate, async (req, res) => {
     }
   } catch (error) {
     throw error;
-    // res.status(500).send({message:"Internal Error"})
   }
 });
 
@@ -73,20 +67,21 @@ router.post("/", validate, async (req, res) => {
         .status(400)
         .send({ message: "The Title of the post is already used" });
     } else {
-      const newBlog = await blogModal.create(req.body);
+      const newBlog = await blogModal.create({
+        ...req.body,
+        userDetails: { name: req.body.name },
+      });
       console.log(newBlog);
       res.status(200).send({ message: "Blog Posted", data: newBlog });
     }
   } catch (error) {
     throw error;
-    // res.status(500).send({message:"Internal Error"})
   }
 });
 
 router.put("/updatePost/:id", async (req, res) => {
   const { title, description, content } = req.body;
   const id = req.params.id;
-  // console.log(content[0])
   const blog = await blogModal.findOne({ _id: id });
   if (blog) {
     try {
@@ -94,12 +89,9 @@ router.put("/updatePost/:id", async (req, res) => {
       blog.description = description;
       blog.content = content;
       await blog.save();
-      // const posts=await blogModal.updateOne({user:id},{$set:{title:title,description:description,content:content}})
-      // console.log(content[0]+"qwerty")
       res.json({ message: "Post updated" });
     } catch (error) {
       throw error;
-      // console.log(error)
     }
   } else {
     res.status(400).send({ message: "Post not found" });
@@ -119,13 +111,7 @@ router.delete("/deletePost/:id", validate, async (req, res) => {
     }
   } catch (error) {
     throw error;
-    // res.status(500).send({message:"Internal Error"})
   }
-  // console.log(postId)
-  // console.log(userId)
-
-  // const posts=await blogModal.deleteOne({$and:[{_id:postId},{user:userId}]})
-  // console.log(posts)
 });
 
 //liking a post
@@ -177,8 +163,6 @@ router.post("/unLikePost/:id", validate, async (req, res) => {
 
 //Comments
 router.post("/comment/:id", async (req, res) => {
-  // console.log(req.body);
-  // console.log(req.params.id);
   try {
     const blog = await blogModal.findOne({ _id: req.params.id });
     if (!blog) {
