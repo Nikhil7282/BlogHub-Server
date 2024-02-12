@@ -83,6 +83,7 @@ router.post("/login", async (req, res) => {
           token: token,
           userId: user._id,
           username: user.username,
+          savedBlogs: user.savedBlogs || [],
         });
       } else {
         res.status(402).send({ message: "Invalid Credentials" });

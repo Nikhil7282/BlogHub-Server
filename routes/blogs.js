@@ -1,11 +1,11 @@
 var express = require("express");
 var router = express.Router();
 //multer
-const multer = require("multer");
 
 //DB
 var mongoose = require("mongoose");
 const { url } = require("../common/dbconfig");
+const userModal = require("../modals/userSchema");
 const blogModal = require("../modals/blogSchema");
 const commentModal = require("../modals/commentSchema");
 const jwt = require("jsonwebtoken");
@@ -53,6 +53,50 @@ router.get("/userpost", validate, async (req, res) => {
     }
   } catch (error) {
     throw error;
+  }
+});
+
+router.get("/savedPosts", async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    let data = jwt.decode(token);
+    if (!data) {
+      return res.status(400).json({ message: "No Token Found" });
+    }
+    const user = await userModal.findOne({ _id: data.id });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid User" });
+    }
+    let savedBlogIds = user.savedBlogs;
+    const saved = await blogModal.find({ _id: { $in: savedBlogIds } });
+    return res.status(200).json({ message: "Success", data: saved });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", error: error });
+  }
+});
+
+router.post("/addSavedPost", async (req, res) => {
+  const { blogId } = req.body;
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    let data = await jwt.decode(token);
+    if (data) {
+      let user = await userModal.findById({ _id: data.id });
+      if (user) {
+        if (user.savedBlogs.includes(blogId)) {
+          return res.status(401).json({ message: "Already Saved" });
+        } else {
+          user.savedBlogs.push(blogId);
+          await user.save();
+          return res.status(200).json({ message: "Blog Saved" });
+        }
+      } else {
+        return res.status(400).json({ message: "Invalid User" });
+      }
+    }
+    return res.status(404).json({ message: "Invalid Token" });
+  } catch (error) {
+    return res.status(500).json({ message: "server error", error: error });
   }
 });
 
