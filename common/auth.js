@@ -27,6 +27,7 @@ const decodeToken = async (token) => {
 };
 
 const validate = async (req, res, next) => {
+  // console.log(req.headers);
   if (req.headers.authorization) {
     const token = req.headers.authorization.split(" ")[1];
     let data = await jwt.decode(token);
@@ -36,7 +37,7 @@ const validate = async (req, res, next) => {
       req.body.name = data.username;
       next();
     } else {
-      // console.log("Token Expired");
+      console.log("Token Expired");
       res.status(401).send({ message: "Token Expired" });
     }
   } else {
