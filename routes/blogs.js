@@ -56,6 +56,7 @@ router.get("/userpost", validate, async (req, res) => {
 });
 
 router.get("/savedPosts", async (req, res) => {
+  const query = req.query.populate;
   try {
     const token = req.headers.authorization.split(" ")[1];
     let data = jwt.decode(token);
@@ -66,10 +67,16 @@ router.get("/savedPosts", async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid User" });
     }
+    if (query === "false") {
+      return res
+        .status(200)
+        .json({ message: "Success", data: user.savedBlogs });
+    }
     let saved = await user.populate("savedBlogs", "-password");
-    console.log(saved);
+    // console.log(saved);
     return res.status(200).json({ message: "Success", data: saved });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Server error", error: error });
   }
 });
@@ -87,7 +94,9 @@ router.post("/addSavedPost", async (req, res) => {
         } else {
           user.savedBlogs.push(blogId);
           await user.save();
-          return res.status(200).json({ message: "Blog Saved" });
+          return res
+            .status(200)
+            .json({ message: "Blog Saved", data: user.savedBlogs });
         }
       } else {
         return res.status(400).json({ message: "Invalid User" });
