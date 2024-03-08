@@ -22,7 +22,6 @@ mongoose
   .catch((error) => {
     console.log(error);
   });
-
 const options = { maxTimeMS: 15000 };
 router.get("/", async (req, res) => {
   const blogs = await blogModal.find({});
@@ -57,6 +56,7 @@ router.get("/userpost", validate, async (req, res) => {
 });
 
 router.get("/savedPosts", async (req, res) => {
+  const query = req.query.populate;
   try {
     const token = req.headers.authorization.split(" ")[1];
     let data = jwt.decode(token);
@@ -67,10 +67,16 @@ router.get("/savedPosts", async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid User" });
     }
-    let savedBlogIds = user.savedBlogs;
-    const saved = await blogModal.find({ _id: { $in: savedBlogIds } });
+    if (query === "false") {
+      return res
+        .status(200)
+        .json({ message: "Success", data: user.savedBlogs });
+    }
+    let saved = await user.populate("savedBlogs", "-password");
+    // console.log(saved);
     return res.status(200).json({ message: "Success", data: saved });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Server error", error: error });
   }
 });
@@ -88,7 +94,9 @@ router.post("/addSavedPost", async (req, res) => {
         } else {
           user.savedBlogs.push(blogId);
           await user.save();
-          return res.status(200).json({ message: "Blog Saved" });
+          return res
+            .status(200)
+            .json({ message: "Blog Saved", data: user.savedBlogs });
         }
       } else {
         return res.status(400).json({ message: "Invalid User" });
@@ -148,13 +156,20 @@ router.delete("/deletePost/:id", validate, async (req, res) => {
     const postId = req.params.id;
     const post = await blogModal.findOne({ _id: postId });
     if (post) {
+      const user = await userModal.findOne({ _id: req.body.user });
+      const index = user.savedBlogs.indexOf(postId);
+      if (index != -1) {
+        user.savedBlogs.splice(index, 1);
+        await user.save();
+      }
       const posts = await blogModal.deleteOne({ _id: postId });
       res.status(200).send({ message: "Post Deleted" });
     } else {
       res.status(400).send({ message: "Post Not Found" });
     }
   } catch (error) {
-    throw error;
+    console.log(error);
+    return res.status(500).send({ message: "Server Error" });
   }
 });
 
