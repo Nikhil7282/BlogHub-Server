@@ -108,6 +108,37 @@ router.post("/addSavedPost", async (req, res) => {
   }
 });
 
+router.delete("/removeSavedPosts/:id", async (req, res) => {
+  const blogId = req.params.id;
+  console.log("BlogId", blogId);
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    let data = await jwt.decode(token);
+    if (data) {
+      let user = await userModal.findById({ _id: data.id });
+      if (user) {
+        if (!user.savedBlogs.includes(blogId)) {
+          return res.status(401).json({ message: "Post Not Saved" });
+        } else {
+          let index = user.savedBlogs.indexOf(blogId);
+          console.log(index);
+          console.log(user.savedBlogs.splice(index, 1));
+          user.savedBlogs.slice(index, 1);
+          await user.save();
+          return res
+            .status(200)
+            .json({ message: "Blog UnSaved", data: user.savedBlogs });
+        }
+      } else {
+        return res.status(400).json({ message: "Invalid User" });
+      }
+    }
+    return res.status(404).json({ message: "Invalid Token" });
+  } catch (error) {
+    return res.status(500).json({ message: "server error", error: error });
+  }
+});
+
 router.post("/", validate, async (req, res) => {
   try {
     const blog = await blogModal.findOne({
