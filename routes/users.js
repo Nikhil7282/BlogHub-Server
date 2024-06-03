@@ -1,9 +1,7 @@
 var express = require("express");
 var router = express.Router();
 //DB
-var mongoose = require("mongoose");
-const { url } = require("../common/dbconfig");
-const userModal = require("../modals/userSchema");
+const userModal = require("../models/userSchema");
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.secretKey;
 const nodemailer = require("nodemailer");
@@ -16,10 +14,6 @@ const {
   decodeToken,
   verifyToken,
 } = require("../common/auth");
-
-//DB Connection
-mongoose.connect(url);
-const options = { maxTimeMS: 15000 };
 
 router.get("/", validate, function (req, res, next) {
   userModal
