@@ -1,28 +1,13 @@
 var express = require("express");
 var router = express.Router();
-//multer
 
-//DB
-var mongoose = require("mongoose");
-const { url } = require("../common/dbconfig");
-const userModal = require("../modals/userSchema");
-const blogModal = require("../modals/blogSchema");
-const commentModal = require("../modals/commentSchema");
+const userModal = require("../models/userSchema");
+const blogModal = require("../models/blogSchema");
+const commentModal = require("../models/commentSchema");
 const jwt = require("jsonwebtoken");
 //Bcrypt
 const { validate } = require("../common/auth");
 
-//DB Connection
-mongoose
-  .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then((response) => {
-    // console.log(response);
-    console.log("Db Connected");
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-const options = { maxTimeMS: 15000 };
 router.get("/", async (req, res) => {
   const blogs = await blogModal.find({});
   try {
